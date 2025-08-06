@@ -13,10 +13,9 @@ export class OtpService {
   ) {}
 
   async canSmsRequest(phone_number: string) {
-    const key = `otp_attempts:${phone_number}`;
-    const value = await this.redisService.getKeyValue(key);
-    const otp = await this.redisService.getTTLKey(key);
-    if (value && otp) {
+    const key = `otp:${phone_number}`;
+    const keyExists = await this.redisService.redis.exists(key);
+    if (keyExists) {
       const ttl = await this.redisService.getTTLKey(key);
       throw new BadRequestException(`Please try again later ${ttl}`);
     }
@@ -27,6 +26,8 @@ export class OtpService {
     await this.checkSmsLimit(phone_number);
     const otpCode = generateOtp();
     await this.eskizService.sendSms(phone_number, otpCode);
+    const key = `otp:${phone_number}`;
+    await this.redisService.addKey(key, otpCode, this.ttlExpireOtp);
     await this.trackSmsRequest(phone_number);
     return {
       message: 'otp sended',
@@ -39,9 +40,6 @@ export class OtpService {
       throw new BadRequestException('otp hourly limit reached');
   }
   async trackSmsRequest(key: string) {
-    const keyOtp = `otp_attempts:${key}`;
-    await this.redisService.incrementKey(keyOtp);
-    await this.redisService.setExpireKey(keyOtp, this.ttlExpireOtp);
     const keyOtpHourly = `otp_attempts_hourly:${key}`;
     await this.redisService.incrementKey(keyOtpHourly);
     await this.redisService.setExpireKey(keyOtpHourly, this.hourlyTTLExpireOtp);

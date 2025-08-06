@@ -38,7 +38,6 @@ export class EskizService {
     formData.set('mobile_phone', phone_number);
     formData.set('message', message);
     formData.set('from', '4546');
-    console.log(formData);
     const { status } = await axios.post(this.send_sms_url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
