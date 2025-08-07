@@ -10,7 +10,13 @@ export class AuthService {
     const data = await this.otpService.sendSms(phone_number);
     return data;
   }
-  async verifyOtp() {}
+  async verifyOtp(phone_number: string, code: string) {
+    await this.otpService.isBlockedUser(phone_number);
+    await this.otpService.verifyOtpCode(phone_number, code);
+    return {
+      message: 'success',
+    };
+  }
   async register() {}
   async login() {}
   async logout() {}
