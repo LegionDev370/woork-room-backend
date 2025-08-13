@@ -53,22 +53,5 @@ export class AuthService {
     return token;
   }
 
-  async me(userId: string) {
-    const findUser = await this.db.prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-      },
-    });
-
-    if (!findUser) throw new NotFoundException('Information not found');
-
-    return findUser;
-  }
-
   async logout() {}
 }

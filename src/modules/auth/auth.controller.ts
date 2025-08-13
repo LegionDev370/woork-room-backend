@@ -1,20 +1,16 @@
 import {
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpException,
   Post,
-  Req,
   Res,
-  UseGuards,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { LoginAuthDto } from './dto/create-auth.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifySmsCodeDto } from './dto/verify.sms.code.dto';
-import { Request, Response } from 'express';
-import { LoginAuthDto } from './dto/create-auth.dto';
-import { AuthGuard } from 'src/common/guards/auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -63,17 +59,6 @@ export class AuthController {
 
     return { token };
   }
-
-  @Get('me')
-  @UseGuards(AuthGuard)
-  async me(@Req() req: Request) {
-    const userId = req['userId'];
-
-    const user = await this.authService.me(userId);
-
-    return { user };
-  }
-
   @Post()
   async logout() {}
 }
