@@ -20,4 +20,12 @@ export class UsersService {
 
     return findUser;
   }
+  async checkEmail(email: string) {
+    const emailExists = await this.db.prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    return emailExists ? true : false;
+  }
 }
