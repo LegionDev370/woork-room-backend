@@ -42,6 +42,9 @@ export class AdminService {
       include: {
         options: true,
       },
+      orderBy: {
+        order_number: 'asc',
+      },
     });
     return questions;
   }

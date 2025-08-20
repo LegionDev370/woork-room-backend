@@ -32,6 +32,7 @@ model UserProfileQuestions {
   question_type QuestionType
   is_required Boolean @default(false)
   step_number Int
+  order_number Int?
   options QuestionOptions[]
   answer UserProfileQuestionAnswers?
   @@map("user_profile_questions")
