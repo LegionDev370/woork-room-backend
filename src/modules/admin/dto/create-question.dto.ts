@@ -11,6 +11,7 @@ import {
 interface IOptions {
   option_text: string;
   option_value: string;
+  order_number: number;
 }
 
 export class CreateQuestionDto {
@@ -23,6 +24,8 @@ export class CreateQuestionDto {
   is_required: Boolean;
   @IsNumber()
   step_number: number;
+  @IsNumber()
+  order_number: number;
   @IsArray()
   @IsOptional()
   options: Array<IOptions>;

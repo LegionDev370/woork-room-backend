@@ -36,7 +36,7 @@ export class OtpService {
     };
   }
   async checkSmsLimit(key: string) {
-    const otpKeyHourly = `sms:otp:${key}:limit:hourly`;
+    const otpKeyHourly = `  `;
     const valueOtpHourly = await this.redisService.getKeyValue(otpKeyHourly);
     if (valueOtpHourly && +valueOtpHourly > this.hourlyOtpAttempts)
       throw new BadRequestException('otp hourly limit reached');

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
-import { LoginAuthDto } from './dto/create-auth.dto';
+import { LoginAuthDto, RegisterAuthDto } from './dto/create-auth.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifySmsCodeDto } from './dto/verify.sms.code.dto';
 
@@ -44,12 +44,13 @@ export class AuthController {
     return true;
   }
 
-  // @Post()
-  // async register(
-  //   @Body() createAuthDto: CreateAuthDto,
-  //   @Res({ passthrough: true }) res: Response,
-  // ) {
-  // }
+  @Post("register")
+  async register(
+    @Body() registerAuthDto: RegisterAuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return await this.authService.register(registerAuthDto);
+  }
 
   @Post('login')
   @HttpCode(200)

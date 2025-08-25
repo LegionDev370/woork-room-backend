@@ -17,13 +17,46 @@ enum QuestionType {
   button
 }
 
+enum Roles {
+  business_owner
+  employee
+  admin
+}
+
+enum Status {
+  pending
+  accepted
+  expired
+  cancelled
+}
 
 model User {
   id String @id @default(uuid())
   email String? @unique
-  username String @unique
+  username String? @unique
   password String
+  phone_number String @unique
+  first_name String?
+  last_name String?
+  role Roles @default(employee)
+  is_email_verified Boolean @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   @@map("users")
+  MemberInvitations MemberInvitations[]
+}
+
+model MemberInvitations {
+  id String @id @default(uuid())
+  email String
+  invited_by_user_id String
+  invitation_token String
+  status Status @default(pending)
+  expires_at DateTime
+  sent_at DateTime @default(now())
+  accepted_at DateTime?
+  Users User @relation(fields: [invited_by_user_id], references: [id], onDelete: Cascade)
+  @@map("member_invitations")
 }
 
 model UserProfileQuestions {
@@ -43,6 +76,7 @@ model QuestionOptions {
   question_id String
   option_text String
   option_value String
+  order_number Int?
   question UserProfileQuestions @relation(fields: [question_id],references: [id],onDelete: Cascade)
   @@map("question_options")
 }
@@ -51,7 +85,7 @@ model QuestionOptions {
 model UserProfileQuestionAnswers {
   id String @id @default(uuid())
   question_id String @unique
-  answer_text String
+  answer_text String?
   question UserProfileQuestions @relation(fields: [question_id],references: [id],onDelete: Cascade)
   answer_options SelectedAnswerOptions[]
   @@map("user_profile_question_anwsers")

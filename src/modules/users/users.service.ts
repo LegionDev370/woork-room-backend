@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/core/database/prisma.service';
 
 @Injectable()
@@ -26,6 +31,18 @@ export class UsersService {
         email,
       },
     });
-    return emailExists ? true : false;
+    if (emailExists) return false;
+    return true;
+  }
+
+  async checkPhoneNumber(phone_number: string) {
+    const phoneNumberExists = await this.db.prisma.user.findUnique({
+      where: {
+        phone_number,
+      },
+    });
+    if (phoneNumberExists)
+      throw new ConflictException('Phone_number already exists');
+    return true;
   }
 }

@@ -12,17 +12,19 @@ export class AdminService {
         question_text: createQuestionDto.question_text,
         question_type: createQuestionDto.question_type,
         is_required: createQuestionDto.is_required ? true : false,
+        order_number: createQuestionDto.order_number,
         step_number: createQuestionDto.step_number,
       },
     });
     if (createQuestionDto?.options.length >= 1) {
       const options = createQuestionDto.options.map(
-        ({ option_text, option_value }) => {
+        ({ option_text, option_value, order_number }) => {
           return this.db.prisma.questionOptions.create({
             data: {
               question_id: question.id,
               option_text,
               option_value,
+              order_number,
             },
           });
         },
@@ -40,7 +42,11 @@ export class AdminService {
         step_number,
       },
       include: {
-        options: true,
+        options: {
+          orderBy: {
+            order_number: 'asc',
+          },
+        },
       },
       orderBy: {
         order_number: 'asc',

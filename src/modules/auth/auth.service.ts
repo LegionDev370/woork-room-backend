@@ -1,19 +1,23 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { OtpService } from './otp.service';
-import { LoginAuthDto } from './dto/create-auth.dto';
+import { LoginAuthDto, RegisterAuthDto } from './dto/create-auth.dto';
 import { PrismaService } from 'src/core/database/prisma.service';
 import bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class AuthService {
   constructor(
     private otpService: OtpService,
+    private users: UsersService,
     private readonly db: PrismaService,
     private readonly jwt: JwtService,
   ) {}
@@ -29,7 +33,52 @@ export class AuthService {
       message: 'success',
     };
   }
-  async register() {}
+  async register(registerAuthDto: RegisterAuthDto) {
+    await this.users.checkPhoneNumber(registerAuthDto.phone_number);
+    const hashedPassword = await bcrypt.hash(registerAuthDto.password, 12);
+    const newUser = await this.db.prisma.user.create({
+      data: {
+        phone_number: registerAuthDto.phone_number,
+        password: hashedPassword,
+      },
+    });
+    registerAuthDto.answers.map(async (answer) => {
+      const newAnswer = await this.db.prisma.userProfileQuestionAnswers.create({
+        data: {
+          question_id: answer.question_id,
+          answer_text: answer.answer_text ? answer.answer_text : null,
+        },
+      });
+      if (answer.option_id) {
+        await this.db.prisma.selectedAnswerOptions.create({
+          data: {
+            answer_id: newAnswer.id,
+            option_id: answer.option_id,
+          },
+        });
+      }
+    });
+    const members = registerAuthDto.member_emails.map(async (member) => {
+      const existUser = await this.db.prisma.user.findFirst({
+        where: {
+          email: member.email,
+        },
+      });
+      if (existUser) {
+        const expireAt = new Date();
+        expireAt.setHours(2);
+        const iToken = await this.createToken();
+        const newMember = await this.db.prisma.memberInvitations.create({
+          data: {
+            email: member.email,
+            expires_at: expireAt,
+            invitation_token: iToken,
+            invited_by_user_id: newUser.id,
+          },
+        });
+      }
+    });
+  }
 
   async login(loginAuthDto: LoginAuthDto) {
     const findEmail = await this.db.prisma.user.findUnique({
@@ -54,4 +103,8 @@ export class AuthService {
   }
 
   async logout() {}
+
+  async createToken() {
+    return uuid();
+  }
 }
