@@ -42,26 +42,29 @@ export class AuthService {
         password: hashedPassword,
       },
     });
+    console.log(registerAuthDto);
     registerAuthDto.answers.map(async (answer) => {
       const newAnswer = await this.db.prisma.userProfileQuestionAnswers.create({
         data: {
           question_id: answer.question_id,
-          answer_text: answer.answer_text ? answer.answer_text : null,
+          answer_text: typeof answer.value === 'string' ? answer.value : null,
         },
       });
-      if (answer.option_id) {
-        await this.db.prisma.selectedAnswerOptions.create({
-          data: {
-            answer_id: newAnswer.id,
-            option_id: answer.option_id,
-          },
+      if (Array.isArray(answer.value)) {
+        answer.value.map(async (value) => {
+          return await this.db.prisma.selectedAnswerOptions.create({
+            data: {
+              option_id: value as string,
+              answer_id: newAnswer.id,
+            },
+          });
         });
       }
     });
-    const members = registerAuthDto.member_emails.map(async (member) => {
+    registerAuthDto.members.map(async (member) => {
       const existUser = await this.db.prisma.user.findFirst({
         where: {
-          email: member.email,
+          email: member,
         },
       });
       if (existUser) {
@@ -70,7 +73,7 @@ export class AuthService {
         const iToken = await this.createToken();
         const newMember = await this.db.prisma.memberInvitations.create({
           data: {
-            email: member.email,
+            email: member,
             expires_at: expireAt,
             invitation_token: iToken,
             invited_by_user_id: newUser.id,

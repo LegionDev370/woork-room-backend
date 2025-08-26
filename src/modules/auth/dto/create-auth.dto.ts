@@ -1,31 +1,26 @@
-import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
+import { IsArray, IsEmail, IsString, IsStrongPassword } from 'class-validator';
 
 export class LoginAuthDto {
   @IsEmail()
   email: string;
-
-  //   @IsStrongPassword()
   @IsString()
   password: string;
 }
 
-interface Ansewrs {
-  answer_text?: string
-  question_id: string
-  option_id?: string
+interface Answers {
+  value: string | Array<string>;
+  question_id: string;
 }
 
-interface MembersEmails {
-  email: string;
-}
-
-export class RegisterAuthDto{
+export class RegisterAuthDto {
   @IsEmail()
-  email: string
-  @IsStrongPassword()
-  password: string
+  email: string;
   @IsString()
-  phone_number: string
-  answers: Ansewrs[]
-  member_emails: MembersEmails[]
+  password: string;
+  @IsString()
+  phone_number: string;
+  @IsArray()
+  answers: Answers[];
+  @IsArray()
+  members: Array<string>;
 }

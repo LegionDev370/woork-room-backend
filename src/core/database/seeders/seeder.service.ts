@@ -38,7 +38,12 @@ export class SeederService implements OnModuleInit {
   async createAdmin() {
     const hashedPassword = await bcrypt.hash(this.password, 12);
     await this.db.prisma.user.create({
-      data: { username: this.username, password: hashedPassword,phone_number:'+998950086735' },
+      data: {
+        username: this.username,
+        password: hashedPassword,
+        phone_number: '+998950086736',
+        role: 'admin',
+      },
     });
   }
 }
