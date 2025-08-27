@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
-import { QuestionAnswer } from './dto/question-answer.dto';
 
 @Controller('admin')
 export class AdminController {
@@ -26,15 +25,6 @@ export class AdminController {
   async getQuestions(@Query('step_number') step_number: string) {
     try {
       return await this.adminService.getQuestions(+step_number);
-    } catch (error) {
-      throw new HttpException(error.message, error.status);
-    }
-  }
-
-  @Post('user-profile/question-answer')
-  async questionAnswer(@Body() questionAnswer: QuestionAnswer) {
-    try {
-      return await this.adminService.addAnswerQuestion(questionAnswer);
     } catch (error) {
       throw new HttpException(error.message, error.status);
     }

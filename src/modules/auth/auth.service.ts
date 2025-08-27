@@ -40,14 +40,15 @@ export class AuthService {
       data: {
         phone_number: registerAuthDto.phone_number,
         password: hashedPassword,
+        email: registerAuthDto.email,
       },
     });
-    console.log(registerAuthDto);
     registerAuthDto.answers.map(async (answer) => {
       const newAnswer = await this.db.prisma.userProfileQuestionAnswers.create({
         data: {
           question_id: answer.question_id,
           answer_text: typeof answer.value === 'string' ? answer.value : null,
+          user_id: newUser.id,
         },
       });
       if (Array.isArray(answer.value)) {
@@ -71,7 +72,7 @@ export class AuthService {
         const expireAt = new Date();
         expireAt.setHours(2);
         const iToken = await this.createToken();
-        const newMember = await this.db.prisma.memberInvitations.create({
+        await this.db.prisma.memberInvitations.create({
           data: {
             email: member,
             expires_at: expireAt,
@@ -81,6 +82,8 @@ export class AuthService {
         });
       }
     });
+    const token = await this.jwt.signAsync({ user_id: newUser.id });
+    return token;
   }
 
   async login(loginAuthDto: LoginAuthDto) {

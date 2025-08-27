@@ -44,12 +44,19 @@ export class AuthController {
     return true;
   }
 
-  @Post("register")
+  @Post('register')
   async register(
     @Body() registerAuthDto: RegisterAuthDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return await this.authService.register(registerAuthDto);
+    const token = await this.authService.register(registerAuthDto);
+    res.cookie('token', token, {
+      httpOnly: true,
+      path: '/',
+      maxAge: 2 * 24 * 60 * 60 * 1000,
+      secure: false,
+      sameSite: 'lax',
+    });
   }
 
   @Post('login')
@@ -63,7 +70,7 @@ export class AuthController {
     res.cookie('token', token, {
       httpOnly: true,
       path: '/',
-      maxAge: 60 * 1000,
+      maxAge: 2 * 24 * 60 * 60 * 1000,
       secure: false,
       sameSite: 'lax',
     });

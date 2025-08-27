@@ -44,6 +44,7 @@ model User {
   updated_at DateTime @updatedAt
   @@map("users")
   MemberInvitations MemberInvitations[]
+  question_answers UserProfileQuestionAnswers[]
 }
 
 model MemberInvitations {
@@ -67,7 +68,7 @@ model UserProfileQuestions {
   step_number Int
   order_number Int?
   options QuestionOptions[]
-  answer UserProfileQuestionAnswers?
+  answer UserProfileQuestionAnswers[]
   @@map("user_profile_questions")
 }
 
@@ -84,10 +85,13 @@ model QuestionOptions {
 
 model UserProfileQuestionAnswers {
   id String @id @default(uuid())
-  question_id String @unique
+  question_id String
   answer_text String?
+  user_id String
   question UserProfileQuestions @relation(fields: [question_id],references: [id],onDelete: Cascade)
+  user User @relation(fields: [user_id],references: [id],onDelete: Cascade)
   answer_options SelectedAnswerOptions[]
+  @@unique([question_id,user_id])
   @@map("user_profile_question_anwsers")
 }
 
