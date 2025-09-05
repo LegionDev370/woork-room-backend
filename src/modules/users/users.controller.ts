@@ -14,7 +14,7 @@ import { AuthGuard } from 'src/common/guards/auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get('me')
+  @Get('me')  
   @UseGuards(AuthGuard)
   async me(@Req() req: Request) {
     const userId = req['userId'];
