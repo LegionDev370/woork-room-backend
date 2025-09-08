@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   HttpCode,
   HttpException,
@@ -54,8 +53,8 @@ export class AuthController {
       httpOnly: true,
       path: '/',
       maxAge: 2 * 24 * 60 * 60 * 1000,
-      secure: false,
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'development' ? false : true,
+      sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
     });
   }
 
@@ -71,8 +70,8 @@ export class AuthController {
       httpOnly: true,
       path: '/',
       maxAge: 2 * 24 * 60 * 60 * 1000,
-      secure: false,
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'development' ? false : true,
+      sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
     });
 
     return { token };

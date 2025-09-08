@@ -1,4 +1,4 @@
-import { UnauthorizedException, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -7,7 +7,7 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { WsGuard } from 'src/common/guards/ws.guard';
 
 interface IUser {
@@ -31,10 +31,9 @@ export class ChatGateway
   afterInit(server: Server) {}
   handleConnection(client: Socket, ...args: any[]) {
     const socketId = client.id;
-    console.log(socketId);
     if (!this.users.has(socketId)) {
       this.users.set(socketId, {
-        email: 'domla', 
+        email: 'domla',
       });
     }
   }
