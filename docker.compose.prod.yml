@@ -6,7 +6,7 @@ services:
       - '3000:4000'
     env_file:
       - .env
-    command: ['sh', '-c', 'npx prisma db push && yarn start:prod']
+    command: sh -c 'npx prisma db push && yarn build && yarn start:prod'
     environment:
       - DATABASE_URL=postgres://postgres:3322@postgres:5432/woork_room
       - REDIS_HOST=redis
