@@ -54,7 +54,7 @@ export class AuthController {
       path: '/',
       maxAge: 2 * 24 * 60 * 60 * 1000,
       secure: false,
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
     });
   }
 
@@ -71,7 +71,7 @@ export class AuthController {
       path: '/',
       maxAge: 2 * 24 * 60 * 60 * 1000,
       secure: false,
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'development' ? 'lax' : 'none',
     });
 
     return { token };
